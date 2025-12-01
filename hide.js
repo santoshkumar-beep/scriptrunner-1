@@ -1,23 +1,18 @@
-{\rtf1\ansi\ansicpg1252\cocoartf2822
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\margl1440\margr1440\vieww11520\viewh8400\viewkind0
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+const targetSelector = '#tempoIssueViewPanel';
 
-\f0\fs24 \cf0 const targetSelector = 'div[data-component-key="com.tempoplugin.tempo-core:tempo-issue-view-panel"]';\
-function hideTempoPanel() \{\
-    const element = document.querySelector(targetSelector);\
-    if (element) \{\
-        element.style.display = 'none';\
-        return true; \
-    \}\
-    return false; \
-\}\
-const maxChecks = 50; \
-let checks = 0;\
-const intervalId = setInterval(() => \{\
-    if (hideTempoPanel() || checks++ >= maxChecks) \{\
-        clearInterval(intervalId);\
-    \}\
-\}, 100);}
+const observer = new MutationObserver((mutations, obs) => {
+    const target = document.querySelector(targetSelector);
+    if (target) {
+        // Element found, hide it using display:none
+        target.style.display = 'none';
+        // Stop observing once the element is successfully hidden
+        obs.disconnect(); 
+    }
+});
+
+// Start observing the entire document body for changes in the subtree
+// The subtree: true flag ensures we catch elements added deep inside the DOM
+observer.observe(document.body, {
+    childList: true, // Watch for new children nodes being added
+    subtree: true    // Watch the entire tree for changes
+});
