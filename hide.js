@@ -1,18 +1,30 @@
-const targetSelector = '#tempoIssueViewPanel';
+const tempoPanelId = 'tempoIssueViewPanel';
 
 const observer = new MutationObserver((mutations, obs) => {
-    const target = document.querySelector(targetSelector);
-    if (target) {
-        // Element found, hide it using display:none
-        target.style.display = 'none';
-        // Stop observing once the element is successfully hidden
-        obs.disconnect(); 
+    // 1. Look for the Tempo panel inside the current document
+    const tempoPanel = document.getElementById(tempoPanelId);
+
+    if (tempoPanel) {
+        // 2. We found the panel. Now find its closest parent element 
+        //    that belongs to the Jira issue view structure (usually a web panel wrapper).
+        //    We look for a div with the generic Jira app-panel-key attribute.
+        let wrapper = tempoPanel.closest('div[data-jira-app-panel-key]');
+
+        // 3. If a wrapper is not found, try removing the panel itself.
+        if (!wrapper) {
+            wrapper = tempoPanel;
+        }
+
+        // 4. Aggressively remove the element from the DOM
+        if (wrapper) {
+            wrapper.remove();
+            obs.disconnect(); 
+        }
     }
 });
 
-// Start observing the entire document body for changes in the subtree
-// The subtree: true flag ensures we catch elements added deep inside the DOM
+// Start observing the entire document body for the element to appear
 observer.observe(document.body, {
-    childList: true, // Watch for new children nodes being added
-    subtree: true    // Watch the entire tree for changes
+    childList: true, 
+    subtree: true 
 });
