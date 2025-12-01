@@ -1,7 +1,12 @@
 <style>
-    /* Target the exact container identified in your provided HTML snippet */
+    /* Target the container that holds the Tempo navigation and body */
     #tempo-container {
-        display: none !important; /* !important ensures it overrides Tempo's styles */
-        height: 0 !important; /* Collapses the space the container might take up */
+        /* This is the critical line: it ensures the element is not displayed */
+        display: none !important; 
+        
+        /* This collapses the space it occupies to prevent blank gaps */
+        height: 0 !important; 
+        padding: 0 !important;
+        margin: 0 !important;
     }
 </style>
