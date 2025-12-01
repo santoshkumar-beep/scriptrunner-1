@@ -1,30 +1,42 @@
-const tempoPanelId = 'tempoIssueViewPanel';
+document.addEventListener('DOMContentLoaded', function() {
+    const tempoPanelId = 'tempoIssueViewPanel';
 
-const observer = new MutationObserver((mutations, obs) => {
-    // 1. Look for the Tempo panel inside the current document
-    const tempoPanel = document.getElementById(tempoPanelId);
+    // Function that handles the hiding logic
+    const hideTempoPanel = () => {
+        const tempoPanel = document.getElementById(tempoPanelId);
 
-    if (tempoPanel) {
-        // 2. We found the panel. Now find its closest parent element 
-        //    that belongs to the Jira issue view structure (usually a web panel wrapper).
-        //    We look for a div with the generic Jira app-panel-key attribute.
-        let wrapper = tempoPanel.closest('div[data-jira-app-panel-key]');
+        if (tempoPanel) {
+            // Find the closest parent wrapper to remove the entire block cleanly
+            let wrapper = tempoPanel.closest('div[data-jira-app-panel-key]');
 
-        // 3. If a wrapper is not found, try removing the panel itself.
-        if (!wrapper) {
-            wrapper = tempoPanel;
+            if (!wrapper) {
+                // If wrapper isn't found, fall back to removing the panel itself
+                wrapper = tempoPanel;
+            }
+
+            if (wrapper) {
+                wrapper.remove();
+                return true; // Indicate success
+            }
         }
+        return false; // Indicate failure
+    };
 
-        // 4. Aggressively remove the element from the DOM
-        if (wrapper) {
-            wrapper.remove();
-            obs.disconnect(); 
-        }
+    // 1. Try to hide it immediately once the DOM is ready
+    if (hideTempoPanel()) {
+        return; // Success! Stop here.
     }
-});
 
-// Start observing the entire document body for the element to appear
-observer.observe(document.body, {
-    childList: true, 
-    subtree: true 
+    // 2. If it's not ready, start the Mutation Observer to catch it when it appears
+    const observer = new MutationObserver((mutations, obs) => {
+        if (hideTempoPanel()) {
+            obs.disconnect(); // Stop watching after successful removal
+        }
+    });
+
+    // Observe the main body of the document
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
 });
